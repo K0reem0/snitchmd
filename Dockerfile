@@ -44,6 +44,7 @@ RUN bun -e "import('cloakbrowser').then(m => m.ensureBinary()).then(p => console
 ###############################################################################
 FROM debian:bookworm-slim
 ENV DEBIAN_FRONTEND=noninteractive
+ENV CLOAKBROWSER_AUTO_UPDATE=false
 
 # Chromium runtime libs (subset of what cloakhq/cloakbrowser:latest installs)
 RUN apt-get update && apt-get install -y --no-install-recommends \

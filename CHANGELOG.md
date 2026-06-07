@@ -5,9 +5,16 @@ All notable changes to snitchmd are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [SemVer](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] — bun-slim branch
+## [0.2.0] — 2026-06-07
 
 Major runtime migration. Container size drops from **1.65 GB → ~835 MB** (-49%).
+
+### Fixed
+
+- Disabled cloakbrowser's runtime auto-update (`CLOAKBROWSER_AUTO_UPDATE=false`
+  in the final image). The library was checking for a newer Chromium on every
+  container start and downloading ~200 MB in the background, defeating the
+  whole point of baking a pinned Chromium into stage 2.
 
 ### Changed
 
