@@ -23,6 +23,10 @@ Options:
                                commit | domcontentloaded | load | networkidle
                                (default: domcontentloaded)
   --wait-for-selector CSS      Wait for a CSS selector before extraction
+  --content-selector CSS       Limit extraction to the matched element's
+                               subtree (waits for it first; fails if absent).
+                               Useful when trafilatura's main-content
+                               heuristic picks the wrong block.
   --headful                    Run headed Chromium under Xvfb instead of headless
   --humanize                   Enable CloakBrowser human-like mouse/keyboard/scroll
   --proxy URL                  Proxy URL (http://user:pass@host:8080 or socks5://...)
@@ -48,6 +52,7 @@ type Args = {
   wait: number;
   waitUntil: "commit" | "domcontentloaded" | "load" | "networkidle";
   waitForSelector?: string;
+  contentSelector?: string;
   headful: boolean;
   humanize: boolean;
   proxy?: string;
@@ -61,7 +66,7 @@ type Args = {
 };
 
 const CACHE_KEY_FIELDS: (keyof Args)[] = [
-  "url", "wait", "waitUntil", "waitForSelector", "headful", "humanize",
+  "url", "wait", "waitUntil", "waitForSelector", "contentSelector", "headful", "humanize",
   "proxy", "timezone", "locale", "includeLinks", "includeImages",
   "favorPrecision", "favorRecall",
 ];
@@ -116,6 +121,7 @@ function parseArgs(argv: string[]): Args {
         break;
       }
       case "--wait-for-selector": args.waitForSelector = requiredString(a, take()); break;
+      case "--content-selector": args.contentSelector = requiredString(a, take()); break;
       case "--headful": args.headful = true; break;
       case "--humanize": args.humanize = true; break;
       case "--proxy": args.proxy = requiredString(a, take()); break;
@@ -180,8 +186,14 @@ async function renderHtml(args: Args): Promise<{ html: string; title: string; ur
     if (args.waitForSelector) {
       await page.waitForSelector(args.waitForSelector, { timeout: args.timeout * 1000 });
     }
+    if (args.contentSelector) {
+      await page.waitForSelector(args.contentSelector, { timeout: args.timeout * 1000 });
+    }
     if (args.wait) await page.waitForTimeout(args.wait * 1000);
-    return { html: await page.content(), title: await page.title(), url: page.url() };
+    const html = args.contentSelector
+      ? await page.$eval(args.contentSelector, (el: Element) => el.outerHTML)
+      : await page.content();
+    return { html, title: await page.title(), url: page.url() };
   } finally {
     await browser.close();
   }

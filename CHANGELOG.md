@@ -5,6 +5,15 @@ All notable changes to snitchmd are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] — 2026-06-07
+
+### Added
+
+- `--content-selector CSS` — limit extraction to the matched element's
+  subtree. Useful when trafilatura's main-content heuristic picks the wrong
+  block (e.g. a comment sidebar on a list page). Snitchmd waits for the
+  selector before extracting and fails clearly if it never appears.
+
 ## [0.2.0] — 2026-06-07
 
 Major runtime migration. Container size drops from **1.65 GB → ~835 MB** (-49%).
