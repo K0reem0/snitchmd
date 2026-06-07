@@ -1,4 +1,4 @@
-version := "0.1.3"
+version := "0.2.0"
 image := "syabro/snitchmd"
 local_image := "snitchmd:local"
 platforms := "linux/amd64,linux/arm64"
