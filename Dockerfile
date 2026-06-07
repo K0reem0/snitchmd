@@ -26,18 +26,16 @@ RUN bun install --production
 # Pre-download CloakBrowser's Chromium binary + trim fat in same layer so the
 # bloat (Windows variant chromium, locales, chromedriver) never makes it
 # into the COPY --from in the final stage.
-RUN bun -e "import('cloakbrowser').then(m => m.ensureBinary()).then(p => console.log('downloaded to', p))" \
- && shopt -s nullglob \
- && versions=( /root/.cloakbrowser/latest_version_linux-* ) \
- && [ ${#versions[@]} -gt 0 ] || { echo "no latest_version_linux-* marker found"; ls -la /root/.cloakbrowser/; exit 1; } \
- && PLATFORM_ID=$(<"${versions[0]}") \
- && [ -n "$PLATFORM_ID" ] || { echo "PLATFORM_ID empty"; exit 1; } \
- && KEEP="/root/.cloakbrowser/chromium-${PLATFORM_ID}" \
+RUN bun -e "const { ensureBinary } = await import('cloakbrowser'); const p = await ensureBinary(); await Bun.write('/tmp/chrome-path', p);" \
+ && CHROME_PATH=$(cat /tmp/chrome-path) \
+ && KEEP=$(dirname "$CHROME_PATH") \
  && [ -d "$KEEP" ] || { echo "expected chromium dir missing: $KEEP"; ls -la /root/.cloakbrowser/; exit 1; } \
+ && shopt -s nullglob \
  && for d in /root/.cloakbrowser/chromium-*; do [ "$d" = "$KEEP" ] || rm -rf "$d"; done \
  && find "$KEEP/locales" -type f ! -name 'en.pak' ! -name 'en-US.pak' -delete \
  && rm -f "$KEEP/chromedriver" \
- && touch /root/.cloakbrowser/.welcome_shown
+ && touch /root/.cloakbrowser/.welcome_shown \
+ && rm -f /tmp/chrome-path
 
 ###############################################################################
 # Stage 3 — final slim runtime
