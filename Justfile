@@ -58,6 +58,7 @@ release new_version:
     just publish
     git push
     git push origin v{{new_version}}
+    scripts/changelog-notes {{new_version}} | gh release create v{{new_version}} --title v{{new_version}} --notes-file -
 
 update-usage-from-help: build
     docker run --rm {{local_image}} --help | scripts/update-skill-help
