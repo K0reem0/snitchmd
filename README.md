@@ -34,13 +34,15 @@ curl -fsSL https://raw.githubusercontent.com/syabro/snitchmd/master/install.sh |
 Without install:
 
 ```bash
-docker run --rm -i -v "${XDG_CACHE_HOME:-$HOME/.cache}/snitchmd:/cache" syabro/snitchmd https://example.com
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/snitchmd"
+mkdir -p "$cache_dir"
+docker run --rm -i -v "$cache_dir:/cache" syabro/snitchmd https://example.com
 ```
 
 Shell alias:
 
 ```bash
-alias snitchmd='docker run --rm -i -v "${XDG_CACHE_HOME:-$HOME/.cache}/snitchmd:/cache" syabro/snitchmd'
+alias snitchmd='cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/snitchmd"; mkdir -p "$cache_dir" && docker run --rm -i -v "$cache_dir:/cache" syabro/snitchmd'
 ```
 
 The image is published as a multi-arch manifest (`linux/amd64` + `linux/arm64`), so Docker pulls the right one for your host automatically.
