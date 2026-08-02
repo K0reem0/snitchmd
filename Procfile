@@ -1,2 +1,1 @@
-worker: bun run snitchmd.ts
-
+worker: bun run snitchmd.ts https://manhuaus.com/manga/banished-disciples-counterattack/chapter-580/
